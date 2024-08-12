@@ -35,12 +35,12 @@ will authenticate and renew automatically.
 
 There are two ways of sending commands:
 
-### Sending predefined commands by topic
+### Sending predefined commands via topic
 
-Send the your selected command as the topic into the node.
+Send your command via the topic into the node.
 You can set the charger, site and/or circuit variables directly in the node, or send them as
 `msg.charger`, `msg.site` and `msg.circuit` to override.
-Implemented commands that may be sent as topic, are:
+Implemented commands that may be sent via topic include:
 
 - `login`
 - `refresh_token`
