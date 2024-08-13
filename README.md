@@ -70,30 +70,57 @@ node.send({
 
 ### Sending custom commands
 
-Send the full path as msg.command, and optionally the POST body as msg.payload.
-See [get_api-chargers](https://developer.easee.com/reference/get_api-chargers) for full list of commands.
-When adding a body, the request will be sent as a POST, else as a GET. If you wish to send a POST without body, add an empty object as POST argument.
+To send custom commands to the Easee API, you'll need to use a function node in Node-RED that feeds into the "easee REST Client" node. This method allows for more flexibility in interacting with the API, enabling you to access endpoints that aren't covered by the predefined commands.
 
-Example to [set dynamic current to 3x25A](https://developer.easee.com/reference/post_api-sites-siteid-circuits-circuitid-dynamiccurrent) by doing a custom command with POST body:
+To construct a custom command, create a function node with the following structure:
 
-Set dynamic current:
 ```javascript
-node.send({ 
-  payload: {
-    path: "/sites/1234/circuits/1345/dynamic_current",
-    body: { phase1: 25, phase2: 25, phase3: 25 },
-  }
-});
+msg.payload = {
+    method: 'GET' or 'POST',
+    path: '/api-endpoint-path',
+    body: {} // Include for POST requests, omit for GET
+};
+return msg;
 ```
 
-Pause charging:
+The `method` field specifies whether it's a GET or POST request. The `path` field should contain the API endpoint you want to access. For POST requests, include a `body` object with the necessary parameters.
+
+To find available API endpoints, refer to the Easee API documentation at https://developer.easee.com/reference. This resource provides a comprehensive list of endpoints and their required parameters.
+
+#### Example 1: Setting a weekly charge plan:
+
 ```javascript
-node.send({ 
-  payload: {
-    path: "/chargers/EH000000/commands/pause_charging",
-    body: {},
-  }
-});
+msg.payload = {
+    method: 'POST',
+    path: '/chargers/EH00000/weekly_charge_plan',
+    body: {
+        "isEnabled": true,
+        "days": [
+            {
+                "dayOfWeek": 0,
+                "ranges": [
+                    {
+                        "chargingCurrentLimit": 32,
+                        "startTime": "10:00",
+                        "stopTime": "11:00"
+                    }
+                ]
+            }
+        ]
+    }
+};
+return msg;
+```
+
+#### Example 2: Adjusting the dynamic charger current to 8 Ampere:
+
+```javascript
+msg.payload = {
+    method: 'POST',
+    path: '/chargers/EH00000/settings',
+    body: { "dynamicChargerCurrent": 8 }
+};
+return msg;
 ```
 
 ## Example
